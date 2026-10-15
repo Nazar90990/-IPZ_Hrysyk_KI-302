@@ -1,0 +1,89 @@
+﻿<Window x:Class="MessengerClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Messenger — Онлайн обмін повідомленнями" Height="680" Width="1100"
+        MinHeight="560" MinWidth="850" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="{StaticResource SidebarBrush}">
+            <Grid Margin="18">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0" Margin="0,0,0,18">
+                    <StackPanel>
+                        <TextBlock Text="Messenger" FontSize="25" FontWeight="Bold" Foreground="White" />
+                        <TextBlock Text="Ваші чати" Foreground="#B9C4DD" Margin="0,3,0,0" />
+                    </StackPanel>
+                    <Button Content="+" Width="40" Height="36" Margin="12,0,0,0" ToolTip="Новий чат" Click="NewChatButton_Click" />
+                </DockPanel>
+                <TextBox Grid.Row="1" x:Name="SearchTextBox" Background="#33415F" Foreground="White" BorderThickness="0" TextChanged="SearchTextBox_TextChanged" ToolTip="Пошук чату" />
+                <ListBox Grid.Row="2" x:Name="ChatsListBox" Margin="0,15,0,12" ItemsSource="{Binding Chats}" SelectedItem="{Binding SelectedChat, Mode=TwoWay}" SelectionChanged="ChatsListBox_SelectionChanged" HorizontalContentAlignment="Stretch">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="10" Margin="0,3" CornerRadius="8" Background="#2B3959">
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <Ellipse Width="38" Height="38" Fill="{StaticResource AccentBrush}" Margin="0,0,9,0" />
+                                    <TextBlock Text="●" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="15" />
+                                    <StackPanel Grid.Column="1"><TextBlock Text="{Binding Title}" Foreground="White" FontWeight="SemiBold" /><TextBlock Text="{Binding Preview}" Foreground="#B9C4DD" FontSize="12" TextTrimming="CharacterEllipsis" /></StackPanel>
+                                    <TextBlock Grid.Column="2" Text="{Binding Time}" Foreground="#B9C4DD" FontSize="11" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Border Grid.Row="3" Background="{StaticResource AccentBrush}" CornerRadius="8" Padding="10">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="48" /><ColumnDefinition Width="76" /></Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0"><TextBlock Text="{Binding CurrentUser.DisplayName}" Foreground="White" FontWeight="SemiBold" /><TextBlock Text="{Binding CurrentUser.Status}" Foreground="#B9C4DD" FontSize="12" /></StackPanel>
+                        <Button Grid.Column="1" Width="48" Height="32" Margin="2,0,2,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0" ToolTip="Налаштування" Click="SettingsButton_Click">
+                            <TextBlock Text="⚙" FontFamily="Segoe UI Symbol" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+                        <Button Grid.Column="2" Content="Вийти" Width="76" Height="32" Margin="2,0,0,0" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0" ToolTip="Вийти з облікового запису" Click="LogoutButton_Click" />
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="1" Background="{StaticResource WindowBackgroundBrush}">
+            <TextBlock x:Name="EmptyChatState" Text="Виберіть чат, щоб надіслати повідомлення" FontSize="22"
+                       Foreground="{StaticResource SecondaryTextBrush}" HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+            <Grid x:Name="ChatContent" Visibility="Collapsed">
+            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="76" /></Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="24,16">
+                <DockPanel>
+                    <StackPanel><TextBlock Text="{Binding SelectedChat.Title}" FontSize="20" FontWeight="SemiBold" /><TextBlock Text="{Binding SelectedChat.IsOnline, StringFormat=Одержувач у мережі: {0}}" Foreground="{StaticResource SecondaryTextBrush}" FontSize="12" /></StackPanel>
+                </DockPanel>
+            </Border>
+            <ListBox Grid.Row="1" ItemsSource="{Binding SelectedChat.Messages}" Margin="24,18" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="13" Margin="0,5" HorizontalAlignment="Left" MaxWidth="650">
+                            <StackPanel><DockPanel><TextBlock Text="{Binding Author}" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" /><TextBlock DockPanel.Dock="Right" Text="{Binding Time}" Margin="18,0,0,0" Foreground="{StaticResource SecondaryTextBrush}" FontSize="11" /></DockPanel><TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="0,6,0,0" /></StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Border Grid.Row="2" Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="18,12" VerticalAlignment="Bottom">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBox x:Name="MessageTextBox" Grid.Column="0" Margin="0,0,10,0" MinHeight="44"
+                             Background="White" BorderThickness="0" Padding="10,8"
+                             VerticalContentAlignment="Center" AcceptsReturn="True" TextWrapping="Wrap"
+                             KeyDown="MessageTextBox_KeyDown" ToolTip="Введіть повідомлення" />
+                    <Button Grid.Column="1" Content="Надіслати" Width="115" Height="44" Margin="0" Click="SendButton_Click" />
+                </Grid>
+            </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
