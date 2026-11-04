@@ -23,8 +23,15 @@ public abstract class BindableObject : INotifyPropertyChanged
 
 public class UserProfile : BindableObject
 {
+    private int _userId;
     private string _displayName = "Олексій Користувач";
     private string _status = "У мережі";
+
+    public int UserId
+    {
+        get => _userId;
+        set => SetProperty(ref _userId, value);
+    }
 
     public string DisplayName
     {
@@ -41,10 +48,17 @@ public class UserProfile : BindableObject
 
 public class Chat : BindableObject
 {
+    private int _userId;
     private string _title = string.Empty;
     private string _preview = string.Empty;
     private string _time = string.Empty;
     private bool _isOnline;
+
+    public int UserId
+    {
+        get => _userId;
+        set => SetProperty(ref _userId, value);
+    }
 
     public string Title
     {
@@ -75,10 +89,36 @@ public class Chat : BindableObject
 
 public class Message : BindableObject
 {
+    private long _id;
+    private int _senderId;
+    private int _receiverId;
     private string _text = string.Empty;
     private string _author = string.Empty;
     private string _time = string.Empty;
+    private string _dateTimeDisplay = string.Empty;
     private bool _isOwn;
+
+    public DateTime? LocalDate { get; set; }
+    public string DateLabel { get; set; } = string.Empty;
+    public bool ShowDateSeparator { get; set; }
+
+    public long Id
+    {
+        get => _id;
+        set => SetProperty(ref _id, value);
+    }
+
+    public int SenderId
+    {
+        get => _senderId;
+        set => SetProperty(ref _senderId, value);
+    }
+
+    public int ReceiverId
+    {
+        get => _receiverId;
+        set => SetProperty(ref _receiverId, value);
+    }
 
     public string Text
     {
@@ -96,6 +136,12 @@ public class Message : BindableObject
     {
         get => _time;
         set => SetProperty(ref _time, value);
+    }
+
+    public string DateTimeDisplay
+    {
+        get => _dateTimeDisplay;
+        set => SetProperty(ref _dateTimeDisplay, value);
     }
 
     public bool IsOwn

@@ -1,9 +1,11 @@
 using System.Windows;
+using MessengerClient.Services;
 
 namespace MessengerClient;
 
 public partial class LoginWindow : Window
 {
+    private readonly TcpMessengerApi _api = new();
     private bool _isRegistrationMode;
 
     public LoginWindow()
@@ -11,7 +13,7 @@ public partial class LoginWindow : Window
         InitializeComponent();
     }
 
-    private void ActionButton_Click(object sender, RoutedEventArgs e)
+    private async void ActionButton_Click(object sender, RoutedEventArgs e)
     {
         try
         {
@@ -29,14 +31,27 @@ public partial class LoginWindow : Window
                 throw new InvalidOperationException("Пароль повинен містити щонайменше 4 символи.");
             }
 
-            var message = _isRegistrationMode
-                ? $"Профіль «{username}» успішно створено."
-                : $"Вітаємо, {username}!";
+            if (_isRegistrationMode)
+            {
+                var registerResult = await _api.RegisterAsync(username, password);
+                if (!registerResult.Success)
+                {
+                    throw new InvalidOperationException(MapServerError(registerResult.Error));
+                }
 
-            MessageBox.Show(message, _isRegistrationMode ? "Реєстрація" : "Авторизація",
-                MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Профіль «{username}» успішно створено.", "Реєстрація",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
 
-            var mainWindow = new MainWindow(username);
+            var loginResult = await _api.LoginAsync(username, password);
+            if (!loginResult.Success)
+            {
+                throw new InvalidOperationException(MapServerError(loginResult.Error));
+            }
+
+            MessageBox.Show($"Вітаємо, {username}!", "Авторизація", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            var mainWindow = new MainWindow(loginResult.UserId, username);
             Application.Current.MainWindow = mainWindow;
             mainWindow.Show();
             Close();
@@ -63,5 +78,27 @@ public partial class LoginWindow : Window
         PasswordInput.Clear();
         ErrorTextBlock.Text = string.Empty;
         UsernameTextBox.Focus();
+    }
+
+    private static string MapServerError(string error)
+    {
+        if (error.Contains("LOGIN_EXISTS", StringComparison.Ordinal))
+        {
+            return "Користувач із таким логіном уже існує.";
+        }
+
+        if (error.Contains("INVALID_CREDENTIALS", StringComparison.Ordinal))
+        {
+            return "Невірний логін або пароль.";
+        }
+
+        if (error.Contains("NO_RESPONSE", StringComparison.Ordinal) ||
+            error.Contains("actively refused", StringComparison.OrdinalIgnoreCase) ||
+            error.Contains("connection", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Сервер недоступний. Запустіть MessengerServer і повторіть спробу.";
+        }
+
+        return $"Помилка сервера: {error}";
     }
 }

@@ -18,11 +18,11 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0" Margin="0,0,0,18">
+                    <Button DockPanel.Dock="Right" Content="+" Width="40" Height="36" ToolTip="Новий чат" Click="NewChatButton_Click" />
                     <StackPanel>
                         <TextBlock Text="Messenger" FontSize="25" FontWeight="Bold" Foreground="White" />
                         <TextBlock Text="Ваші чати" Foreground="#B9C4DD" Margin="0,3,0,0" />
                     </StackPanel>
-                    <Button Content="+" Width="40" Height="36" Margin="12,0,0,0" ToolTip="Новий чат" Click="NewChatButton_Click" />
                 </DockPanel>
                 <TextBox Grid.Row="1" x:Name="SearchTextBox" Background="#33415F" Foreground="White" BorderThickness="0" TextChanged="SearchTextBox_TextChanged" ToolTip="Пошук чату" />
                 <ListBox Grid.Row="2" x:Name="ChatsListBox" Margin="0,15,0,12" ItemsSource="{Binding Chats}" SelectedItem="{Binding SelectedChat, Mode=TwoWay}" SelectionChanged="ChatsListBox_SelectionChanged" HorizontalContentAlignment="Stretch">
@@ -61,15 +61,41 @@
             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="76" /></Grid.RowDefinitions>
             <Border Grid.Row="0" Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="24,16">
                 <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Видалити чат" Width="130" Height="36" Click="DeleteChatButton_Click" />
                     <StackPanel><TextBlock Text="{Binding SelectedChat.Title}" FontSize="20" FontWeight="SemiBold" /><TextBlock Text="{Binding SelectedChat.IsOnline, StringFormat=Одержувач у мережі: {0}}" Foreground="{StaticResource SecondaryTextBrush}" FontSize="12" /></StackPanel>
                 </DockPanel>
             </Border>
-            <ListBox Grid.Row="1" ItemsSource="{Binding SelectedChat.Messages}" Margin="24,18" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListBox Grid.Row="1" ItemsSource="{Binding SelectedChat.Messages}" Margin="24,18" ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalContentAlignment="Stretch">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="13" Margin="0,5" HorizontalAlignment="Left" MaxWidth="650">
-                            <StackPanel><DockPanel><TextBlock Text="{Binding Author}" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" /><TextBlock DockPanel.Dock="Right" Text="{Binding Time}" Margin="18,0,0,0" Foreground="{StaticResource SecondaryTextBrush}" FontSize="11" /></DockPanel><TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="0,6,0,0" /></StackPanel>
-                        </Border>
+                        <StackPanel>
+                            <Border Background="{StaticResource BorderBrush}" CornerRadius="14" Padding="12,4" Margin="0,8" HorizontalAlignment="Center">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ShowDateSeparator}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding DateLabel}" Foreground="{StaticResource SecondaryTextBrush}" FontWeight="SemiBold" />
+                            </Border>
+                            <Border Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="13" Margin="0,5" MaxWidth="650">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="HorizontalAlignment" Value="Left" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsOwn}" Value="False">
+                                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <StackPanel><DockPanel><TextBlock Text="{Binding Author}" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" /><TextBlock DockPanel.Dock="Right" Text="{Binding Time}" Margin="18,0,0,0" Foreground="{StaticResource SecondaryTextBrush}" FontSize="11" /></DockPanel><TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="0,6,0,0" /></StackPanel>
+                            </Border>
+                        </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
